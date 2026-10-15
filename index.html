@@ -1,0 +1,467 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>주왕 &amp; 희진의 방</title>
+<style>
+/* 휴대폰 한 손 조작: 한 열 카드 흐름, 방 지도는 2열 문 */
+:root{
+  --bg:#f7f1e8; --surface:#fffdf9; --ink:#2b2622; --muted:#7a6f66; --line:#e6dccf;
+  --accent:#8a5a44; --accent-ink:#fff; --gold:#c49a55; --gold-soft:#fff8ea; --gold-soft2:#f6e7cf;
+  --field:#ffffff; --ok:#3f7d5a; --bad:#b4483c; --soft:#f1e6d8;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#1d1916; --surface:#28221e; --ink:#f1e9e0; --muted:#b3a69a; --line:#40362f;
+  --accent:#d99f80; --accent-ink:#1d1916; --gold:#c9a160; --gold-soft:#352b20; --gold-soft2:#2c241b;
+  --field:#191512; --ok:#72c296; --bad:#e8806f; --soft:#322923; color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#1d1916; --surface:#28221e; --ink:#f1e9e0; --muted:#b3a69a; --line:#40362f;
+  --accent:#d99f80; --accent-ink:#1d1916; --gold:#c9a160; --gold-soft:#352b20; --gold-soft2:#2c241b;
+  --field:#191512; --ok:#72c296; --bad:#e8806f; --soft:#322923; color-scheme:dark }
+@media (prefers-reduced-motion: reduce){ .shake{animation:none!important} }
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif;line-height:1.55;-webkit-text-size-adjust:100%}
+.wrap{max-width:480px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:26px;margin:8px 0 4px;letter-spacing:-.5px}
+h2{font-size:21px;margin:4px 0 12px}
+.sub{color:var(--muted);font-size:14px}
+.pre{white-space:pre-line}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px;margin:14px 0;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.btn{display:block;width:100%;border:0;border-radius:12px;padding:14px;font-size:17px;font-weight:600;background:var(--accent);color:var(--accent-ink);cursor:pointer;font-family:inherit}
+.btn.ghost{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+.btn.small{display:inline-block;width:auto;padding:8px 12px;font-size:14px}
+.btn:disabled{opacity:.4}
+input.ans{width:100%;font-size:22px;padding:12px 14px;border:2px solid var(--line);border-radius:12px;background:var(--field);color:var(--ink);text-align:center;font-family:inherit;margin:8px 0 12px}
+input.ans:focus{outline:none;border-color:var(--accent)}
+.top{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:14px;color:var(--muted)}
+.keys{display:flex;gap:6px;justify-content:center;margin:14px 0}
+.keys span{width:40px;height:40px;border-radius:10px;border:2px dashed var(--line);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:var(--accent)}
+.keys span.on{border:2px solid var(--gold);background:var(--gold-soft)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.door{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 10px;text-align:center;cursor:pointer;font-family:inherit;color:inherit;font-size:15px}
+.door .em{font-size:30px;display:block}
+.door .no{font-size:12px;color:var(--muted)}
+.door.done{background:var(--gold-soft);border-color:var(--gold)}
+.door.done .em{filter:grayscale(.2)}
+.door.final{grid-column:1/-1;padding:18px}
+.door.final.lockd{opacity:.5}
+.choice{display:block;width:100%;text-align:left;margin:8px 0;padding:14px;border-radius:12px;border:1px solid var(--line);background:var(--field);font-size:16px;font-family:inherit;color:var(--ink);cursor:pointer}
+.choice:disabled{text-decoration:line-through;opacity:.45}
+.msg{min-height:24px;text-align:center;font-size:15px}
+.msg.bad{color:var(--bad)} .msg.ok{color:var(--ok)}
+.hints{display:flex;gap:8px;margin-top:6px}
+.hint{flex:1;background:var(--soft);border-radius:10px;padding:10px;font-size:14px;margin-top:8px}
+.shake{animation:sh .35s}
+@keyframes sh{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.unlock{text-align:center;padding:18px;border-radius:16px;background:linear-gradient(160deg,var(--gold-soft),var(--gold-soft2));border:1px solid var(--gold);margin:14px 0}
+.bigkey{font-size:52px;font-weight:800;color:var(--accent);line-height:1.1}
+.qa .q{font-weight:700;font-size:17px}
+.qa .t{color:var(--muted);font-size:14px;margin-top:6px}
+.qa .a{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)}
+.slots{display:flex;gap:6px;justify-content:center;margin:16px 0}
+.slots span{width:46px;height:52px;border-radius:10px;border:2px solid var(--line);background:var(--field);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700}
+.tiles{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.tile{width:52px;height:52px;border-radius:12px;border:2px solid var(--gold);background:var(--gold-soft);font-size:24px;font-weight:700;color:var(--accent);cursor:pointer;font-family:inherit}
+.tile:disabled{opacity:.25}
+.escape{text-align:center}
+.escape .verse{font-size:15px;color:var(--muted);margin:14px 0}
+.stat{display:flex;justify-content:space-around;margin:12px 0;text-align:center}
+.stat b{display:block;font-size:22px}
+.foot{text-align:center;margin-top:28px;font-size:12px;color:var(--muted)}
+.foot a{color:var(--muted)}
+button:focus-visible,input:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.link{background:none;border:0;color:var(--accent);font-size:15px;padding:6px 0;cursor:pointer;font-family:inherit}
+/* 진행자(빔) 화면 */
+body.host .wrap{max-width:1100px;padding:24px 32px}
+body.host h1{font-size:40px}
+.hnav{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 18px}
+.hnav button{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:8px 12px;font-size:16px;cursor:pointer;font-family:inherit;color:var(--ink)}
+.hnav button.cur{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.hslide{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:32px 40px;min-height:60vh}
+.hslide h2{font-size:34px}
+.hslide .pre{font-size:24px}
+.hreveal{margin-top:22px;padding:22px;border-radius:16px;background:var(--gold-soft);border:1px solid var(--gold)}
+.hreveal .ans{font-size:40px;font-weight:800;color:var(--accent)}
+.hreveal .pre{font-size:22px}
+.hq{font-size:26px;font-weight:700;margin-top:18px}
+#qr{display:flex;justify-content:center;margin:20px 0}
+.url{font-size:28px;text-align:center;word-break:break-all;font-weight:700}
+ul.big{font-size:24px}
+.fab{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom, 0px));border:0;border-radius:999px;padding:12px 18px;font:inherit;font-size:15px;font-weight:700;background:var(--accent);color:var(--accent-ink);box-shadow:0 4px 14px rgba(0,0,0,.18);cursor:pointer;z-index:5}
+.sheet{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:6;display:flex;align-items:flex-end;justify-content:center}
+.sheet[hidden]{display:none}
+.sheetin{background:var(--bg);width:100%;max-width:480px;border-radius:18px 18px 0 0;padding:14px 16px calc(20px + env(safe-area-inset-bottom, 0px))}
+.qrrow{display:flex;flex-wrap:wrap;gap:40px;justify-content:center;margin:24px 0}
+.qrbox{text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px}
+.qrt{font-size:28px;font-weight:700}
+.qr{background:#fff;padding:14px;border-radius:12px;line-height:0}
+.hans{margin-top:18px;padding-top:16px;border-top:1px dashed var(--gold);font-size:24px}
+.ask .q{font-weight:700;font-size:17px}
+.ask textarea{width:100%;font:inherit;font-size:16px;padding:10px 12px;border:2px solid var(--line);border-radius:12px;background:var(--field);color:var(--ink);margin:10px 0;resize:vertical}
+.ask textarea:focus{outline:none;border-color:var(--accent)}
+.who{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.chip{border:1px solid var(--line);background:var(--field);color:var(--ink);border-radius:999px;padding:6px 12px;font:inherit;font-size:14px;cursor:pointer}
+.chip.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+ul.big li{margin:10px 0}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<button class="fab" id="fab" hidden>🙋 질문 남기기</button>
+<div class="sheet" id="sheet" hidden><div class="sheetin"><div class="top"><span></span><button class="link" id="sheetx">닫기 ✕</button></div><div data-qp-sheet></div></div></div>
+<script>
+const DATA = {"meta": {"title": "주왕 & 희진의 방", "subtitle": "사랑의교회 청년2국 리더모임 · 2026.10.15", "public_url": "", "intro": "두 사람의 이야기 속에 6개의 방이 있습니다.\n\n방마다 문제를 풀면 열쇠 글자 하나와 Q&A 카드가 열립니다.\n열쇠 6개를 모아 마지막 문을 열면 탈출!\n\n방 순서는 자유, 힌트는 방마다 2개.\n두 사람에게 묻고 싶은 것은 방 목록 아래에 남겨 주세요.\n정답과 두 사람의 답은 Q&A 세션에서 공개합니다.", "form": {"action": "https://docs.google.com/forms/d/e/1FAIpQLSdy3_00iKTWQuCz_PpqycLIROkaEp0rl_i2vMlUASoYlSENMQ/formResponse", "entry_name": "entry.1672681685", "entry_text": "entry.1860934723", "entry_kind": "entry.1357571097"}}, "rooms": [{"id": "r1", "emoji": "📱", "title": "우리를 이어 준 것", "type": "choice", "prompt": "2025년 9월, 두 사람이 처음 연결됐다.\n\n두 사람을 이어 준 것은?", "hints": ["시작은 두 사람의 손안에서", "자기소개를 「열심히」 적어야 하는 곳"], "choices": ["교회 선배의 소개", "청년부 수련회 같은 조", "크리스천 데이트 앱", "회사 동료의 소개팅"], "salt": "esc1015|r1|", "hashes": ["ecc6cd4b0b42017bbecb9311c8ff651dfd2c4d7b43ddf8c5aab30e0cb306d7b7"], "cards": {"ecc6cd4b0b42017bbecb9311c8ff651dfd2c4d7b43ddf8c5aab30e0cb306d7b7": "oY61lqVYYnmUe+Jjj/h0P5NQe2A8or707AWRsCroUIRLUySx0mWpTO6d2fRPuM2XQRd3M2PjC2GWLySwKQsx1KL08NrjKfqyhBzGyE4Di1j7LnRXVD6JDRvvqFWpj3Tbq7LXPBEWMrFhVPSI3D+I7hU8aZz2RFX7O7ssEQz5jhKxSic214cE3QiofKLKft0KTqrQEQcRxVL1jQDUenUa/7VMyRHPWDzwqeg="}}, {"id": "r2", "emoji": "👀", "title": "첫인상", "type": "text", "prompt": "첫 만남 날, 신랑이 신부를 보고 든 첫 생각.\n\n「옷을 왜 ○○○ 입으셨을까?」\n\n빈칸 세 글자는?", "hints": ["앞뒤나 안팎이 바뀐 상태", "초성: ㄱㄲㄹ"], "placeholder": "세 글자", "salt": "esc1015|r2|", "hashes": ["d67e376503e9e19de47e287f6433655e97995468d129ddebff96399bdf2404e2", "c6b834c68f741f5c877c5ab703fe474f098138d1001710f3635b83df2714716d", "65ef015b29d23a364173d8c2f504b9abf45e5f50be6e2e2c41cb618acd8d2179", "ba423683856ac197c85a1c70d4ce16f830fcefa7c08c8aec2e76dfa8943fc8d0"], "cards": {"d67e376503e9e19de47e287f6433655e97995468d129ddebff96399bdf2404e2": "xyK9GoylCJOKgdnzwwAG92m5jbxqSPq3T4L3teeAlo7C/s/3H57CQK6PQVNEUoeSs/DzGB/NBEQDyZgFHDv7HxhTQghIFXL/9GXfV/bH5Ionc58MIVcOIF21PQbfE6fB7Z45KdCDi7PyycPFjEfBs4YVNXSH1SUO4qDq9/BCpb64SKTAO8f9HFSNCyTv0ImUg3cIoYyn+E5V4cMlq5Pa+LE79A==", "c6b834c68f741f5c877c5ab703fe474f098138d1001710f3635b83df2714716d": "WKkNI+tcO/YINO8lq1U85zLnYkvmxSvWGOdcSRxJuS7gzCjOgRzUpC6Eq6RfiMxLOC3cd/En3bNQMSBGfq/PSpeQeahm08sF6JpG9Z9Kt14XN6dLwyVQ2Zpgr+sBWiGoSWMrxPIqpIvVazOlSVemcItGTfMnBLzrbpKWwMO94+fzAUzB34+nzVdX1N60EEGWXNHCG2VvyPmG6dS6hK1BTStDNg==", "65ef015b29d23a364173d8c2f504b9abf45e5f50be6e2e2c41cb618acd8d2179": "cosgVf+ZohadrarrkPGTcOJW/caq3Q9xRgAa5WjngOglqSk5OfltEjG/S7KwoaLB+kA/ic7L39Sq9/EMxAcIO4eTwps02+OckByjqwAKkjNw2F9FbbwsgVqPKCrigtj1xvnsZ9vaH4PLENTKhYNxzDzIa8lnJGJ3sY+xQsSnsOWloHRbKihOeZlyQCswqOM0uR2PdU+MN24lxV1aIzY+caAbVg==", "ba423683856ac197c85a1c70d4ce16f830fcefa7c08c8aec2e76dfa8943fc8d0": "fAz+4BHOeQEiJPG9tkyfNITeKevz5a6SQifBivnr8vlqAC4aQTv9l2MChqeFStuf+joiYZDrjErqHKuMtP8A3laV4iG8k0DvEsluF6NzOMfpvjgnNWpBhzrFa493VJT114pJ9f+tHaOu1r86xjoSS6wQPb+8EIg9VWseMPy0/Z9wM9eEyfyOKrRfLK3Bx1+LGwmd7At7w/HeTYWDVliwlkpFFA=="}}, {"id": "r3", "emoji": "💍", "title": "결혼하겠다 싶었던 순간", "type": "choice", "prompt": "신랑이 「이 사람이랑 결혼하겠다」 싶었던 이유.\n셋은 진짜, 하나는 가짜.\n\n가짜는?", "hints": ["마음이 아니라 손으로 하는 것", "부엌과 관련 있다"], "choices": ["서로 닮았다", "함께 있으면 편안하다", "온전히 이해받는다고 느꼈다", "요리 솜씨에 반했다"], "salt": "esc1015|r3|", "hashes": ["eeaa38df753fa03df5b2bbb5a7bb0d06a0ff00c9ef8c4c137c597e44340ed719"], "cards": {"eeaa38df753fa03df5b2bbb5a7bb0d06a0ff00c9ef8c4c137c597e44340ed719": "3XP67hiqDH+4+tKpDLf08xC8PHOgGcFmD3aUKaZe8stKPocie+bvLJlm/Jy+lQyIpvURusW0eUDiY6kuY0jQkQ6UmnK8tkf22r32cWG9bjzMtUj/NArfb+ujIZ/2ndU1CdGJ3jc0TJ92G+2gYadtDlyio0r6Bf1Ys+AfYvkdtWv8KLSwz5bc4xV5n1+WqnFEEL+BtRHeuKwZyDp3yLGVhQtcKVWHZOtaeXt/Dt4FQRo5k9c="}}, {"id": "r4", "emoji": "🕊️", "title": "싸움 기록", "type": "number", "prompt": "만난 지 1년.\n두 사람이 지금까지 다툰 횟수는?\n\n숫자로 입력하라.", "hints": ["생각보다 적다", "이보다 적을 수는 없다"], "placeholder": "숫자", "salt": "esc1015|r4|", "hashes": ["a8229287a25fdf3022a5f1c0d45c0f29cfd2f628c56d1c58909c3942a9dbdbcd"], "cards": {"a8229287a25fdf3022a5f1c0d45c0f29cfd2f628c56d1c58909c3942a9dbdbcd": "L8R+SjMuR+IByrUTmB9p0Sq916lPWhw2Cj8nFb2fALWXjFWjLQ/LHVAFc2gCGgiu9V5zdqy6opFs+HV8NG5Q9rUZnsxB24PSHgQdbUpUfsKUfn+FmpFKG94L2lfWEnHHaTiXwlJdTo/U2hIp7+yMdN9OqgGIt6YXHIGqcUO2pqtcYsvTjBoOrgq9kGRhASNNl9W5PsI+cxKJ"}}, {"id": "r5", "emoji": "🏠", "title": "가장 많이 조율한 것", "type": "choice", "prompt": "결혼 준비하며 가장 많이 조율한 것.\n두 사람에게 따로 물었는데 답이 같았다.\n\n무엇일까?", "hints": ["결혼 후 매일 돌아갈 곳", "지도 앱을 가장 많이 켠 주제"], "choices": ["예식장", "신혼집 위치", "신혼여행지", "청첩장 문구"], "salt": "esc1015|r5|", "hashes": ["bcbf1114255fe147effe5f40ba0a4518729577ebf6ef9bb67a23b7b80faaf7d1"], "cards": {"bcbf1114255fe147effe5f40ba0a4518729577ebf6ef9bb67a23b7b80faaf7d1": "N4zow6OTw2Q8RNxdveHzh/nmYk/qGlKCYmIiLNH5PeACtUGOhiqi82ydjPy9BlF7uWm0gmzj5jC1AkL0zIayo//DSZcJa7ZMo36+ZIG2Rz9+JFnzEZxi32CciAovr9Fu+JeosChExtpcaxy0uX0rhfTWPTHmdseLs/XxfmvpsbD72Ix3ILmdXOzBcT9mpcE6Uwu+PDt8CxG3OzSqlThzxPu4JQ=="}}, {"id": "r6", "emoji": "💒", "title": "그날", "type": "number", "prompt": "5월 24일, 신랑이 낸 결혼식 날짜 후보:\n「10월 31일 vs 12월 12일」\n\n결과는… 둘 다 아니었다.\n정답은 그 사이 어느 토요일 오후 5시.\n\n결혼식 날짜를 4자리 숫자(MMDD)로.", "hints": ["11월", "11월 둘째 토요일"], "placeholder": "MMDD", "salt": "esc1015|r6|", "hashes": ["83ebd5682660755791d8ca917f2f1ea30e7819a68a5559d4cc8bcbd20b9a00a6"], "cards": {"83ebd5682660755791d8ca917f2f1ea30e7819a68a5559d4cc8bcbd20b9a00a6": "Mkla+j/AyuBmswXwVaBIHwlEuaam4IuPNa2I77UM4XTt0jSb0/ReRZ4gUIXEb4UVtvTxLPT1HLt9KWJMycDVS4nLcJJXfTT58nlSGoT+2PoPjZdnlUcvt+S9J5k+OUfdIMB6SxWipXtNfNBQ1Yjqe+mAAtvCWF/1W9F8HT5yF4MdOZhwroVrL0YYtNdJX9kixMAYs3gDPiYIR7fVYjqRQZSXafQ="}}], "final": {"prompt": "모은 열쇠 글자 6개를 순서대로 놓아라.", "hint": "요한복음 13장 34절", "salt": "esc1015|final|", "hashes": ["adefe1dce40a6d373ad912823574f03e28bc6b2d6a4559591af21cbd1d4dd701"], "cards": {"adefe1dce40a6d373ad912823574f03e28bc6b2d6a4559591af21cbd1d4dd701": "wwOiHlYTA/QROpZnR+tvHi/G2Qv65AKXWnr0Swnqg7IPyIHwytp3x+qigsVu2RzPo5TW124hphT8CMcYo4R5IMAl9Boz4zvB2UJsMePTKBDJeBACDHuS4+TGK+5bJs1UVzgEIcs57vRLyxpxXf2//R0+fRGKsPubt7YSyMAZE133A6vDYFECMFVVgxq7ztwIvk7xDZG86M+DyAIz2U35DGKa5abap3p6m18uhcVtsYy85Cy8gVEB61Ve6wZrxSrs2jxcOKqAyXM1/AxuxqdG9TKPdo+zgpQ0ktgHmjyas7GynANurU1gxCGVxUB9yNJ+rwPwzerkOLhcRuQ41b7AglJQDNBkgawr0OUq1O0bSsXWQkH1OxFYwolAScUe1y77/yaPGNf8AzsaxhtvRL+jQyLDN5sNsA6bF+utb+1BHgXq413o"}}, "host": {"salt": "esc1015|host|", "hashes": ["ed829fa316e4e3ec276fdee1c552ee0cb98c58e77423367433214e7516857752"], "cards": {"ed829fa316e4e3ec276fdee1c552ee0cb98c58e77423367433214e7516857752": "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"}}};
+
+/* ---------- SHA-256 (외부 의존 없음: http·file 어디서 열어도 동작) ---------- */
+const K = (() => { const k=[]; let n=2; while(k.length<64){ let p=true; for(let d=2;d*d<=n;d++) if(n%d===0){p=false;break;} if(p) k.push((Math.cbrt(n)%1)*4294967296>>>0); n++; } return k; })();
+const H0 = [0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
+function sha256(bytes){
+  const l=bytes.length, padLen=((l+9+63)>>6)<<6, m=new Uint8Array(padLen); m.set(bytes); m[l]=0x80;
+  const dv=new DataView(m.buffer); dv.setUint32(padLen-8, Math.floor(l/536870912)); dv.setUint32(padLen-4, (l*8)>>>0);
+  const W=new Uint32Array(64); let H=H0.slice(); const r=(x,n)=>(x>>>n)|(x<<(32-n));
+  for(let i=0;i<padLen;i+=64){
+    for(let t=0;t<16;t++) W[t]=dv.getUint32(i+t*4);
+    for(let t=16;t<64;t++){ const x=W[t-15], y=W[t-2]; W[t]=(W[t-16]+(r(x,7)^r(x,18)^(x>>>3))+W[t-7]+(r(y,17)^r(y,19)^(y>>>10)))>>>0; }
+    let [a,b,c,d,e,f,g,h]=H;
+    for(let t=0;t<64;t++){
+      const t1=(h+(r(e,6)^r(e,11)^r(e,25))+((e&f)^(~e&g))+K[t]+W[t])>>>0;
+      const t2=((r(a,2)^r(a,13)^r(a,22))+((a&b)^(a&c)^(b&c)))>>>0;
+      h=g; g=f; f=e; e=(d+t1)>>>0; d=c; c=b; b=a; a=(t1+t2)>>>0;
+    }
+    H=[H[0]+a,H[1]+b,H[2]+c,H[3]+d,H[4]+e,H[5]+f,H[6]+g,H[7]+h].map(x=>x>>>0);
+  }
+  const out=new Uint8Array(32), ov=new DataView(out.buffer); H.forEach((x,i)=>ov.setUint32(i*4,x)); return out;
+}
+const enc8 = s => new TextEncoder().encode(s);
+const hex = b => Array.from(b, x=>x.toString(16).padStart(2,'0')).join('');
+function norm(s){ s=String(s).normalize('NFC').toLowerCase().replace(/[\s.,!?~'"()\-·\/:]/g,''); if(s.length>1) s=s.replace(/역$/,''); return s; }
+function tryOpen(lock, input){
+  const n=norm(input), hx=hex(sha256(enc8(lock.salt+n)));
+  if(!lock.hashes.includes(hx)) return null;
+  const key=sha256(enc8('key|'+lock.salt+n)), ct=Uint8Array.from(atob(lock.cards[hx]), c=>c.charCodeAt(0)), pt=new Uint8Array(ct.length);
+  for(let i=0;i<ct.length;i+=32){ const kb=new Uint8Array(36); kb.set(key); new DataView(kb.buffer).setUint32(32, i/32); const ks=sha256(kb); for(let j=0;j<32&&i+j<ct.length;j++) pt[i+j]=ct[i+j]^ks[j]; }
+  const s=new TextDecoder().decode(pt); return s.startsWith('OK:') ? JSON.parse(s.slice(3)) : null;
+}
+
+/* ---------- 상태 (브라우저에 저장: 새로고침해도 이어짐) ---------- */
+const SKEY='esc1015-v1';
+let S = load();
+function load(){ try{ return JSON.parse(localStorage.getItem(SKEY))||fresh(); }catch(e){ return fresh(); } }
+function fresh(){ return {name:'', start:0, solved:{}, hints:{}, end:0, finalNorm:'', asked:[], recordSent:false}; }
+function save(){ try{ localStorage.setItem(SKEY, JSON.stringify(S)); }catch(e){} }
+const cards = {};   // 방 id -> 풀린 카드(정답으로 복호화)
+function restore(){ DATA.rooms.forEach(r=>{ if(S.solved[r.id]){ const c=tryOpen(r,S.solved[r.id]); if(c) cards[r.id]=c; else delete S.solved[r.id]; } }); }
+
+const $ = (h) => { const t=document.createElement('template'); t.innerHTML=h.trim(); return t.content.firstChild; };
+const esc = s => String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const app = document.getElementById('app');
+const solvedCount = () => DATA.rooms.filter(r=>cards[r.id]).length;
+const hintTotal = () => Object.values(S.hints).reduce((a,b)=>a+b,0);
+function mmss(ms){ const s=Math.max(0,Math.floor(ms/1000)); return Math.floor(s/60)+'분 '+String(s%60).padStart(2,'0')+'초'; }
+function clock(t){ const d=new Date(t); return [d.getHours(),d.getMinutes(),d.getSeconds()].map(x=>String(x).padStart(2,'0')).join(':'); }
+let tick=null;
+function setTick(fn){ if(tick) clearInterval(tick); tick = fn ? setInterval(fn,1000) : null; }
+
+function keysBar(){
+  return '<div class="keys">'+DATA.rooms.map(r=>'<span class="'+(cards[r.id]?'on':'')+'">'+(cards[r.id]?esc(cards[r.id].key):'')+'</span>').join('')+'</div>';
+}
+
+/* ---------- 구글 폼 전송 (화면에 폼은 보이지 않는다) ---------- */
+const FORM = DATA.meta.form || {};
+const formReady = () => !!(FORM.action && FORM.entry_name && FORM.entry_text && FORM.entry_kind);
+function sendForm(kind, text){
+  if(!formReady()) return Promise.reject(new Error('form not set'));
+  const b=new URLSearchParams();
+  b.append(FORM.entry_name, S.name||'(이름 없음)'); b.append(FORM.entry_text, text); b.append(FORM.entry_kind, kind);
+  // no-cors: 응답을 읽을 수 없다. 네트워크 오류만 잡힌다. 실제 접수는 응답 시트로 확인한다
+  return fetch(FORM.action, {method:'POST', mode:'no-cors', body:b});
+}
+function mountAsk(root){
+  if(!root) return;
+  if(!formReady()){ root.hidden=true; return; }
+  if(!Array.isArray(S.asked)) S.asked=[];
+  root.innerHTML=`<div class="card ask"><div class="q">🙋 두 사람에게 질문 남기기</div>
+    <div class="sub">Q&amp;A 세션에서 두 사람이 답해요. 몇 개든 괜찮아요.</div>
+    <div class="who" role="group" aria-label="누구에게">${['둘 다','신랑에게','신부에게'].map((w,i)=>`<button type="button" class="chip${i?'':' on'}" data-w="${w}">${w}</button>`).join('')}</div>
+    <textarea id="askq" rows="3" maxlength="300" placeholder="예: 프러포즈는 어떻게 할 계획인가요?"></textarea>
+    <button class="btn" id="asks">보내기</button><div class="msg" id="askm"></div>
+    <div class="sub" id="askn"></div></div>`;
+  let who='둘 다';
+  root.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{ who=c.dataset.w; root.querySelectorAll('.chip').forEach(x=>x.classList.toggle('on',x===c)); });
+  const ta=root.querySelector('#askq'), bt=root.querySelector('#asks'), m=root.querySelector('#askm'), n=root.querySelector('#askn');
+  const cnt=()=>{ n.textContent=S.asked.length?`지금까지 남긴 질문 ${S.asked.length}개`:''; };
+  cnt();
+  bt.onclick=()=>{
+    const t=ta.value.trim(); if(!t){ ta.classList.add('shake'); setTimeout(()=>ta.classList.remove('shake'),400); return; }
+    bt.disabled=true; m.className='msg'; m.textContent='보내는 중…';
+    sendForm('질문', `[${who}] ${t}`).then(()=>{ S.asked.push(t); save(); ta.value=''; m.className='msg ok'; m.textContent='보냈어요! 고마워요 🙏'; cnt(); })
+      .catch(()=>{ m.className='msg bad'; m.textContent='보내지 못했어요. 인터넷 연결을 확인하고 다시 눌러 주세요'; })
+      .finally(()=>{ bt.disabled=false; });
+  };
+}
+function fabSync(){
+  const f=document.getElementById('fab'); if(!f) return;
+  const onPlayer = !document.body.classList.contains('host') && !!S.name && !!S.start && !app.querySelector('[data-qp]');
+  f.hidden = !(formReady() && onPlayer);
+}
+document.getElementById('fab').onclick=()=>{ const sh=document.getElementById('sheet'); sh.hidden=false; mountAsk(sh.querySelector('[data-qp-sheet]')); };
+document.getElementById('sheetx').onclick=()=>{ document.getElementById('sheet').hidden=true; };
+new MutationObserver(fabSync).observe(document.getElementById('app'),{childList:true});
+function sendRecord(){
+  if(S.recordSent || !formReady()) return;
+  sendForm('탈출 기록', `걸린 시간 ${mmss(S.end-S.start)} / 힌트 ${hintTotal()}개 / 탈출 시각 ${clock(S.end)}`)
+    .then(()=>{ S.recordSent=true; save(); }).catch(()=>{});
+}
+
+/* ---------- 화면: 시작 ---------- */
+function viewIntro(){
+  setTick(null);
+  app.innerHTML='';
+  app.append($(`<div>
+    <div class="sub">${esc(DATA.meta.subtitle)}</div>
+    <h1>${esc(DATA.meta.title)}</h1>
+    <div class="card pre">${esc(DATA.meta.intro)}</div>
+    <div class="card">
+      <label class="sub">이름(닉네임)</label>
+      <input class="ans" id="nm" maxlength="12" placeholder="예: 홍길동" value="${esc(S.name)}">
+      <button class="btn" id="go">입장하기</button>
+    </div></div>`));
+  document.getElementById('go').onclick=()=>{
+    const v=document.getElementById('nm').value.trim();
+    if(!v){ document.getElementById('nm').classList.add('shake'); setTimeout(()=>document.getElementById('nm').classList.remove('shake'),400); return; }
+    S.name=v; if(!S.start) S.start=Date.now(); save(); viewMap();
+  };
+}
+
+/* ---------- 화면: 방 지도 ---------- */
+function viewMap(){
+  if(S.end) return viewEscape();
+  const n=solvedCount();
+  app.innerHTML='';
+  const el=$(`<div>
+    <div class="top"><span>🙋 ${esc(S.name)}</span><span id="tm"></span></div>
+    <h2 style="margin-top:14px">열쇠 ${n} / ${DATA.rooms.length}</h2>
+    ${keysBar()}
+    <div class="grid" id="g"></div>
+    <div class="qpanel" data-qp></div>
+    <div class="foot"><button class="link" id="rs">처음부터 다시 하기</button><div id="rsc" hidden>진행 기록을 모두 지울까요? <button class="link" id="rsy">지우기</button> · <button class="link" id="rsn">취소</button></div></div>
+  </div>`);
+  app.append(el);
+  mountAsk(el.querySelector('[data-qp]'));
+  const g=el.querySelector('#g');
+  DATA.rooms.forEach((r,i)=>{
+    const d=$(`<button class="door ${cards[r.id]?'done':''}"><span class="no">방 ${i+1}</span><span class="em">${cards[r.id]?'🔓':r.emoji}</span>${esc(r.title)}</button>`);
+    d.onclick=()=>viewRoom(r,i); g.append(d);
+  });
+  const all=n===DATA.rooms.length;
+  const f=$(`<button class="door final ${all?'':'lockd'}"><span class="em">${all?'🚪':'🔐'}</span>마지막 문${all?'':' (열쇠 6개 필요)'}</button>`);
+  f.onclick=()=>{ if(all) viewFinal(); else { f.classList.add('shake'); setTimeout(()=>f.classList.remove('shake'),400); } };
+  g.append(f);
+  el.querySelector('#rs').onclick=()=>{ el.querySelector('#rs').hidden=true; el.querySelector('#rsc').hidden=false; };
+  el.querySelector('#rsn').onclick=()=>{ el.querySelector('#rs').hidden=false; el.querySelector('#rsc').hidden=true; };
+  el.querySelector('#rsy').onclick=()=>{ S=fresh(); for(const k in cards) delete cards[k]; save(); viewIntro(); };
+  const upd=()=>{ const t=document.getElementById('tm'); if(t) t.textContent='⏱ '+mmss(Date.now()-S.start); };
+  upd(); setTick(upd);
+  window.scrollTo(0,0);
+}
+
+/* ---------- 화면: 방 ---------- */
+function qaCard(c){
+  return `<div class="card qa"><div class="sub">Q&amp;A 카드</div><div class="q">Q. ${esc(c.question)}</div>
+    ${c.teaser?`<div class="t">${esc(c.teaser)}</div>`:''}
+    <div class="a ${c.answer?'':'sub'}">${c.answer?esc(c.answer):'두 사람의 답은 Q&A 세션에서 공개합니다.'}</div></div>`;
+}
+function viewRoom(r,i){
+  setTick(null);
+  app.innerHTML='';
+  const done=cards[r.id];
+  const el=$(`<div>
+    <div class="top"><button class="link" id="bk">← 방 목록</button><span>방 ${i+1} / ${DATA.rooms.length}</span></div>
+    <h2>${r.emoji} ${esc(r.title)}</h2>
+    <div class="card pre">${esc(r.prompt)}</div>
+    <div id="play"></div>
+    <div id="res"></div>
+  </div>`);
+  app.append(el);
+  el.querySelector('#bk').onclick=viewMap;
+  const play=el.querySelector('#play'), res=el.querySelector('#res');
+  const showUnlocked=(c,fresh)=>{
+    play.innerHTML='';
+    res.innerHTML=`<div class="unlock">${fresh?'<div class="sub">🎉 정답!</div>':''}<div class="sub">열쇠 글자</div><div class="bigkey">${esc(c.key)}</div></div>${qaCard(c)}
+      <button class="btn" id="nx">${solvedCount()===DATA.rooms.length?'마지막 문으로 →':'방 목록으로'}</button>`;
+    res.querySelector('#nx').onclick=()=> solvedCount()===DATA.rooms.length ? viewFinal() : viewMap();
+  };
+  if(done) return showUnlocked(done,false);
+  const submit=(val, target)=>{
+    const c=tryOpen(r,val);
+    const msg=play.querySelector('.msg');
+    if(c){ cards[r.id]=c; S.solved[r.id]=norm(val); save(); showUnlocked(c,true); window.scrollTo(0,0); return true; }
+    msg.className='msg bad'; msg.textContent=['아직 열리지 않아요','다시 한번!','힌트를 써 보세요 🙂'][Math.min(2,(submit.n=(submit.n||0)+1)-1)];
+    if(target){ target.classList.add('shake'); setTimeout(()=>target.classList.remove('shake'),400); }
+    return false;
+  };
+  if(r.type==='choice'){
+    play.append($(`<div class="card" id="cs"></div>`));
+    const cs=play.querySelector('#cs');
+    r.choices.forEach((t,k)=>{ const b=$(`<button class="choice">${'①②③④⑤'[k]} ${esc(t)}</button>`); b.onclick=()=>{ if(!submit(String(k+1),b)) b.disabled=true; }; cs.append(b); });
+    cs.append($('<div class="msg"></div>'));
+  } else {
+    play.append($(`<div class="card">
+      <input class="ans" id="in" placeholder="${esc(r.placeholder||'정답')}" ${r.type==='number'?'inputmode="numeric" maxlength="4"':''} autocomplete="off">
+      <button class="btn" id="ok">확인</button>
+      <div class="msg"></div></div>`));
+    const inp=play.querySelector('#in');
+    const go=()=>{ if(inp.value.trim()) submit(inp.value, inp); };
+    play.querySelector('#ok').onclick=go;
+    inp.addEventListener('keydown',e=>{ if(e.key==='Enter') go(); });
+  }
+  const hb=$(`<div><div class="hints" id="hb"></div><div id="hs"></div></div>`);
+  play.append(hb);
+  const drawHints=()=>{
+    const used=S.hints[r.id]||0, hbEl=hb.querySelector('#hb'), hs=hb.querySelector('#hs');
+    hs.innerHTML=r.hints.slice(0,used).map((h,k)=>`<div class="hint">💡 힌트 ${k+1}: ${esc(h)}</div>`).join('');
+    hbEl.innerHTML='';
+    if(used<r.hints.length){ const b=$(`<button class="btn ghost small">💡 힌트 ${used+1} 보기</button>`); b.onclick=()=>{ S.hints[r.id]=used+1; save(); drawHints(); }; hbEl.append(b); }
+  };
+  drawHints();
+  window.scrollTo(0,0);
+}
+
+/* ---------- 화면: 마지막 문 ---------- */
+function viewFinal(){
+  if(S.end) return viewEscape();
+  setTick(null);
+  const letters=DATA.rooms.map(r=>cards[r.id].key);
+  const order=letters.map((_,i)=>i).sort(()=>Math.random()-.5);
+  let picked=[];
+  app.innerHTML='';
+  const el=$(`<div>
+    <div class="top"><button class="link" id="bk">← 방 목록</button><span>마지막 문</span></div>
+    <h2>🚪 마지막 문</h2>
+    <div class="card"><div class="pre">${esc(DATA.final.prompt)}</div><div class="slots" id="sl"></div><div class="tiles" id="tl"></div>
+      <div class="msg" id="ms"></div>
+      <div style="display:flex;gap:8px;margin-top:10px"><button class="btn ghost" id="cl">다시 놓기</button></div>
+      <div id="hs"></div><div style="margin-top:8px"><button class="btn ghost small" id="hb">💡 힌트 보기</button></div>
+    </div></div>`);
+  app.append(el);
+  el.querySelector('#bk').onclick=viewMap;
+  const sl=el.querySelector('#sl'), tl=el.querySelector('#tl'), ms=el.querySelector('#ms');
+  const draw=()=>{
+    sl.innerHTML=letters.map((_,i)=>`<span>${picked[i]!==undefined?esc(letters[picked[i]]):''}</span>`).join('');
+    tl.innerHTML='';
+    order.forEach(i=>{ const b=$(`<button class="tile">${esc(letters[i])}</button>`); b.disabled=picked.includes(i); b.onclick=()=>{ picked.push(i); draw(); check(); }; tl.append(b); });
+  };
+  const check=()=>{
+    if(picked.length<letters.length) { ms.textContent=''; return; }
+    const word=picked.map(i=>letters[i]).join('');
+    const c=tryOpen(DATA.final, word);
+    if(c){ S.end=Date.now(); S.finalNorm=norm(word); save(); viewEscape(); }
+    else { ms.className='msg bad'; ms.textContent='문이 열리지 않아요. 순서를 바꿔 보세요'; sl.classList.add('shake'); setTimeout(()=>{sl.classList.remove('shake'); picked=[]; draw();},700); }
+  };
+  el.querySelector('#cl').onclick=()=>{ picked=[]; ms.textContent=''; draw(); };
+  el.querySelector('#hb').onclick=()=>{ S.hints.final=1; save(); el.querySelector('#hs').innerHTML=`<div class="hint">💡 ${esc(DATA.final.hint)}</div>`; el.querySelector('#hb').remove(); };
+  if(S.hints.final){ el.querySelector('#hs').innerHTML=`<div class="hint">💡 ${esc(DATA.final.hint)}</div>`; el.querySelector('#hb').remove(); }
+  draw();
+  window.scrollTo(0,0);
+}
+
+/* ---------- 화면: 탈출 ---------- */
+function viewEscape(){
+  setTick(null);
+  const c=tryOpen(DATA.final, S.finalNorm);
+  if(!c){ S.end=0; save(); return viewMap(); }
+  app.innerHTML='';
+  const el=$(`<div class="escape">
+    <div class="sub">${esc(DATA.meta.subtitle)}</div>
+    <div class="unlock"><div style="font-size:44px">🕊️</div><h1>${esc(c.title)}</h1><div class="sub">${esc(S.name)}</div>
+      <div class="stat"><div><b>${mmss(S.end-S.start)}</b><span class="sub">걸린 시간</span></div><div><b>${clock(S.end)}</b><span class="sub">탈출 시각</span></div><div><b>${hintTotal()}</b><span class="sub">힌트</span></div></div>
+    </div>
+    ${keysBar()}
+    <div class="verse pre">${esc(c.verse)}</div>
+    <div class="card pre">${esc(c.message)}</div>
+    <div class="qpanel" data-qp></div>
+    <h2 style="text-align:left;margin-top:22px">모은 Q&amp;A 카드</h2>
+    <div id="qa" style="text-align:left"></div>
+  </div>`);
+  app.append(el);
+  mountAsk(el.querySelector('[data-qp]'));
+  sendRecord();
+  const qa=el.querySelector('#qa');
+  DATA.rooms.forEach(r=>{ if(cards[r.id]) qa.append($(qaCard(cards[r.id]))); });
+  window.scrollTo(0,0);
+}
+
+/* ---------- QR ---------- */
+function qrInto(el, text, size){
+  const mk=()=>{ try{ el.innerHTML=''; new QRCode(el,{text,width:size,height:size,correctLevel:QRCode.CorrectLevel.M}); }catch(e){ el.textContent=text; } };
+  if(window.QRCode) return mk();
+  let sc=document.getElementById('qrlib');
+  if(!sc){ sc=document.createElement('script'); sc.id='qrlib'; sc.src='https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js'; document.head.append(sc); }
+  sc.addEventListener('load', mk); sc.addEventListener('error', ()=>{ el.textContent=text; });
+}
+const entryUrl = () => DATA.meta.public_url || location.href.split('?')[0].split('#')[0];
+function entryBlock(big){
+  const f=DATA.meta.question_form_url;
+  return `<div class="qrrow">
+    <div class="qrbox"><div class="qrt">📱 방탈출 입장</div><div class="qr" id="qrA"></div><div class="sub">휴대폰 카메라로 찍어 주세요</div></div>
+    ${f?`<div class="qrbox"><div class="qrt">🙋 두 사람에게 질문 남기기</div><div class="qr" id="qrB"></div><div class="sub">익명으로 남길 수 있어요</div></div>`:''}
+  </div>`;
+}
+function fillQR(size){ const a=document.getElementById('qrA'); if(a) qrInto(a, entryUrl(), size); const b=document.getElementById('qrB'); if(b) qrInto(b, DATA.meta.question_form_url, size); }
+function viewQR(){
+  document.body.classList.add('host');
+  app.innerHTML='';
+  app.append($(`<div style="text-align:center"><div class="sub" style="font-size:20px">${esc(DATA.meta.subtitle)}</div><h1>${esc(DATA.meta.title)}</h1>${entryBlock()}
+    <p class="pre" style="font-size:22px">${esc(DATA.meta.intro)}</p></div>`));
+  fillQR(320);
+}
+
+/* ---------- 진행자(빔) 화면: 주소 끝에 #host ---------- */
+function viewHost(){
+  document.body.classList.add('host');
+  app.innerHTML='';
+  const el=$(`<div><h1>${esc(DATA.meta.title)} · 진행자</h1>
+    <div class="card" style="max-width:420px"><input class="ans" id="pw" type="password" placeholder="진행자 암호"><button class="btn" id="go">열기</button><div class="msg" id="ms"></div></div></div>`);
+  app.append(el);
+  const go=()=>{ const H=tryOpen(DATA.host, el.querySelector('#pw').value); if(!H){ const m=el.querySelector('#ms'); m.className='msg bad'; m.textContent='암호가 맞지 않습니다'; return; } hostShow(H); };
+  el.querySelector('#go').onclick=go;
+  el.querySelector('#pw').addEventListener('keydown',e=>{ if(e.key==='Enter') go(); });
+}
+function hostShow(H){
+    const slides=[{t:'입장'}].concat(DATA.rooms.map((r,i)=>({t:'방 '+(i+1),r,i,h:H.rooms[i]}))).concat([{t:'마지막 문'},{t:'예상 질문'},{t:'질문'},{t:'기도제목'}]);
+  let cur=0; const shown={};
+  const draw=()=>{
+    const s=slides[cur];
+    let body='';
+    if(s.t==='입장') body=`<h2 style="text-align:center">${esc(DATA.meta.title)}</h2>${entryBlock()}`;
+    else if(s.r){ const h=s.h; body=`<div class="sub" style="font-size:20px">방 ${s.i+1}</div><h2>${s.r.emoji} ${esc(s.r.title)}</h2><div class="pre">${esc(s.r.prompt)}</div>`+
+      (s.r.choices?`<ol style="font-size:22px">${s.r.choices.map(c=>'<li>'+esc(c)+'</li>').join('')}</ol>`:'')+
+      (shown[cur]?`<div class="hreveal"><div class="sub">정답 · 열쇠 「${esc(h.key)}」</div><div class="ans">${esc(h.answer)}</div><div class="hq">Q. ${esc(h.question)}</div>`+
+        (shown[cur]>1?`<div class="pre hans">${esc(h.behind)}</div>`:`<div style="margin-top:18px"><button class="btn" id="rv" style="max-width:320px">두 사람의 답 공개</button></div>`)+`</div>`
+        :`<div style="margin-top:24px"><button class="btn" id="rv" style="max-width:320px">정답 공개</button></div>`); }
+    else if(s.t==='마지막 문') body=`<h2>🚪 마지막 문</h2><div class="pre">${esc(DATA.final.prompt)}</div>`+(shown[cur]?`<div class="hreveal"><div class="ans">${esc(H.final_answer)}</div><div class="pre">요한복음 13:34</div></div>`:`<div style="margin-top:24px"><button class="btn" id="rv" style="max-width:320px">정답 공개</button></div>`);
+    else if(s.t==='예상 질문') body=`<h2>💬 이런 질문도 나올 수 있어요</h2><ul class="big">${(H.expected||[]).map(q=>'<li>'+esc(q)+'</li>').join('')}</ul>`;
+    else if(s.t==='질문') body=`<h2>🙋 리더들이 남긴 질문</h2>`+(formReady()?`<p class="sub" style="font-size:18px">질문은 구글 폼 응답(스프레드시트)에 실시간으로 쌓입니다.</p>`:'')+`<ul class="big">${H.questions.filter(q=>!q.startsWith('(')).map(q=>'<li>'+esc(q)+'</li>').join('')}</ul>`;
+    else body=`<h2>🙏 기도제목</h2><ul class="big">${H.prayers.map(q=>'<li>'+esc(q)+'</li>').join('')}</ul>`;
+    app.innerHTML='';
+    const el=$(`<div><div class="hnav">${slides.map((x,i)=>`<button class="${i===cur?'cur':''}" data-i="${i}">${esc(x.t)}</button>`).join('')}</div><div class="hslide">${body}</div><div class="foot">← → 키로 넘기기 · Space 로 정답 → 두 사람의 답 순서로 공개</div></div>`);
+    app.append(el);
+    el.querySelectorAll('.hnav button').forEach(b=>b.onclick=()=>{ cur=+b.dataset.i; draw(); });
+    const rv=el.querySelector('#rv'); if(rv) rv.onclick=()=>{ step(); };
+    if(s.t==='입장') fillQR(300);
+  };
+  const step=()=>{ const s=slides[cur], max=s.r?2:(s.t==='마지막 문'?1:0); if((shown[cur]||0)<max){ shown[cur]=(shown[cur]||0)+1; draw(); } };
+  document.onkeydown=e=>{ if(e.key==='ArrowRight'&&cur<slides.length-1){cur++;draw();} else if(e.key==='ArrowLeft'&&cur>0){cur--;draw();} else if(e.key===' '){ e.preventDefault(); step(); } };
+  draw();
+}
+
+/* ---------- 시작 ---------- */
+if(/[?&]host\b/.test(location.search) || location.hash==='#host') viewHost();
+else if(location.hash==='#qr') viewQR();
+else { restore(); save(); if(!S.name||!S.start) viewIntro(); else viewMap(); }
+</script>
+</body>
+</html>
