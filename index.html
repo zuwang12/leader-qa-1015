@@ -399,12 +399,22 @@ function viewEscape(){
     <div class="qpanel" data-qp></div>
     <h2 style="text-align:left;margin-top:22px">모은 Q&amp;A 카드</h2>
     <div id="qa" style="text-align:left"></div>
+    <div class="card" style="margin-top:22px">
+      <button class="btn ghost" id="again">↺ 처음으로 돌아가기</button>
+      <div id="againc" hidden style="margin-top:12px">
+        <div class="sub" style="margin-bottom:10px">탈출 기록과 모은 열쇠·카드가 이 휴대폰에서 지워지고 처음 화면으로 돌아갑니다.<br>(이미 보낸 질문과 탈출 기록은 그대로 남아요)</div>
+        <div style="display:flex;gap:8px"><button class="btn" id="againy">처음부터 다시 하기</button><button class="btn ghost" id="againn">취소</button></div>
+      </div>
+    </div>
   </div>`);
   app.append(el);
   mountAsk(el.querySelector('[data-qp]'));
   sendRecord();
   const qa=el.querySelector('#qa');
   DATA.rooms.forEach(r=>{ if(cards[r.id]) qa.append($(qaCard(cards[r.id]))); });
+  el.querySelector('#again').onclick=()=>{ el.querySelector('#again').hidden=true; el.querySelector('#againc').hidden=false; };
+  el.querySelector('#againn').onclick=()=>{ el.querySelector('#again').hidden=false; el.querySelector('#againc').hidden=true; };
+  el.querySelector('#againy').onclick=()=>{ S=fresh(); for(const k in cards) delete cards[k]; save(); viewIntro(); window.scrollTo(0,0); };
   window.scrollTo(0,0);
 }
 
